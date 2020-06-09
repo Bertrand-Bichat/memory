@@ -5,7 +5,7 @@ import GuessCount from './GuessCount'
 import sinon from 'sinon'
 import Card from './Card'
 
-import App from './App'
+import App, { SYMBOLS } from './App'
 
 describe('<App />', () => {
   it('renders without crashing', () => {
@@ -22,6 +22,19 @@ describe('<App />', () => {
     const wrapper = shallow(<App />)
     expect(wrapper.find('Card')).to.have.length(36)
   })
+
+  it('should match its reference snapshot', () => {
+    const mock = sinon
+      .stub(App.prototype, 'generateCards')
+      .returns([...SYMBOLS.repeat(2)])
+    try {
+      const wrapper = shallow(<App />)
+  
+      expect(wrapper).to.matchSnapshot()
+    } finally {
+      mock.restore()
+    }
+  })
 })
 
 describe('<Card/>', () => {
@@ -33,5 +46,14 @@ describe('<Card/>', () => {
 
     wrapper.simulate('click')
     expect(onClick).to.have.been.calledWith(0)
+  })
+
+  it('should match its reference snapshot', () => {
+    const onClick = sinon.spy()
+    const wrapper = shallow(
+      <Card card="😁" feedback="hidden" index={0} onClick={onClick} />
+    )
+  
+    expect(wrapper).to.matchSnapshot()
   })
 })
